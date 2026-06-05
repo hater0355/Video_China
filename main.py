@@ -46,13 +46,34 @@ def main():
         extract_audio(original_video_path, audio_path)
         chinese_subtitles = transcribe_chinese_audio(audio_path)
         
+        # FIX: Validate that subtitles were extracted
+        if not chinese_subtitles:
+            logger.error("No subtitles were transcribed from the audio.")
+            return
+        
+        logger.info(f"Transcribed {len(chinese_subtitles)} subtitle segments.")
+        
         # STEP 3: Context-Aware Machine Translation
         logger.info("--- STEP 3: Context-Aware Machine Translation ---")
         vietnamese_subtitles = translate_subtitles(chinese_subtitles)
         
+        # FIX: Validate translation output
+        if not vietnamese_subtitles:
+            logger.error("Translation failed or returned empty result.")
+            return
+            
+        logger.info(f"Translated {len(vietnamese_subtitles)} subtitle segments.")
+        
         # STEP 4: Vietnamese TTS & Audio Alignment
         logger.info("--- STEP 4: Vietnamese TTS & Audio Alignment ---")
         voice_segments = generate_vietnamese_voice(vietnamese_subtitles, tts_dir)
+        
+        # FIX: Validate that voice segments were generated
+        if not voice_segments:
+            logger.error("No voice segments were generated. Pipeline cannot continue.")
+            return
+            
+        logger.info(f"Generated {len(voice_segments)} voice segments.")
         
         # STEP 5: Video Composition & Spintax
         logger.info("--- STEP 5: Video Composition & Spintax ---")

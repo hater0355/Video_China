@@ -25,8 +25,8 @@ def compose_final_video(original_video_path: str, voice_segments: list[dict], ou
         inputs.append(seg["audio_path"])
         input_index = i + 1
         start_ms = int(seg["start"] * 1000)
-        # delay audio for all channels to position the segment correctly
-        filter_complex += f"[{input_index}:a]adelay={start_ms}:all=1[a{input_index}];"
+        # FIXED: Correct syntax for adelay filter (=all=1 not :all=1)
+        filter_complex += f"[{input_index}:a]adelay={start_ms}|{start_ms}[a{input_index}];"
         amix_inputs += f"[a{input_index}]"
         
     num_audio_streams = len(voice_segments) + 1

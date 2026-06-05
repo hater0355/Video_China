@@ -1,0 +1,5 @@
+yt-dlp
+openai
+azure-cognitiveservices-speech
+python-dotenv
+customtkinter

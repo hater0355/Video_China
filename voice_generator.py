@@ -74,13 +74,14 @@ def generate_vietnamese_voice(subtitles: list[dict], output_dir: str) -> list[di
         try:
             generated_duration = get_audio_duration(temp_wav_path)
             
-            # If generated audio is longer than the window, speed it up
-            if generated_duration > original_duration:
-                speed_ratio = generated_duration / original_duration
+            # If generated audio duration differs from target window, adjust speed
+            # FIX: Correct calculation - if generated_duration > original_duration, slow down (speed < 1)
+            if generated_duration > original_duration and generated_duration > 0:
+                speed_ratio = original_duration / generated_duration  # FIXED: was reversed
                 # FFmpeg atempo works best between 0.5 and 2.0
-                if speed_ratio > 2.0:
+                if speed_ratio < 0.5:
                     logger.warning(f"Segment {idx} requires {speed_ratio:.2f}x speed, which may sound unnatural.")
-                logger.info(f"Segment {idx}: Speeding up by {speed_ratio:.2f}x to fit window.")
+                logger.info(f"Segment {idx}: Adjusting speed to {speed_ratio:.2f}x to fit window.")
                 apply_atempo(temp_wav_path, final_wav_path, speed_ratio)
             else:
                 os.rename(temp_wav_path, final_wav_path)
